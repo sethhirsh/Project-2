@@ -152,15 +152,13 @@ def analyze_tweet_sentiment(tweet):
     total = 0
     count = 0
     "*** YOUR CODE HERE ***"
-    print(tweet_words(tweet))
     for word in tweet_words(tweet):
         if has_sentiment(get_word_sentiment(word)):
-            print(get_word_sentiment(word))
             total += sentiment_value(get_word_sentiment(word))
-            count +=1
+            count += 1
     if count == 0:
         return make_sentiment(None)
-    average = total/count
+    average = total / count
     return make_sentiment(average)
 
 

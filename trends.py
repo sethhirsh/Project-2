@@ -199,11 +199,15 @@ def find_centroid(polygon):
         c_y += (y(i) + y(i + 1)) * (x(i) * y(i + 1) - x(i + 1) * y(i))
 
     polygon_area = abs(polygon_area) / 2
-    c_x = abs(c_x) / (6 * polygon_area)
-    c_y = abs(c_y) / (6 * polygon_area)
 
+    if polygon_area == 0:
+        return (x(0),y(0),polygon_area)
+
+    c_x = c_x / (6 * polygon_area)
+    c_y = c_y / (6 * polygon_area)
 
     return (c_x, c_y, polygon_area)
+
 
 
 def find_state_center(polygons):
@@ -228,6 +232,23 @@ def find_state_center(polygons):
     -156.21763
     """
     "*** YOUR CODE HERE ***"
+    total_c_x = 0
+    total_c_y = 0
+    num_polygons = len(polygons)
+    total_area = 0
+
+    for each_polygon in polygons:
+        print(each_polygon)
+        c_x,c_y,polygon_area = find_centroid(each_polygon)
+        total_c_x += c_x * polygon_area
+        total_c_y += c_y * polygon_area
+        total_area += polygon_area
+
+    average_c_x = total_c_x / total_area
+    average_c_y = total_c_y / total_area
+
+    return make_position(average_c_x,average_c_y)
+
 
 
 

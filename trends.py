@@ -238,7 +238,6 @@ def find_state_center(polygons):
     total_area = 0
 
     for each_polygon in polygons:
-        print(each_polygon)
         c_x,c_y,polygon_area = find_centroid(each_polygon)
         total_c_x += c_x * polygon_area
         total_c_y += c_y * polygon_area
@@ -283,7 +282,7 @@ def find_closest_state(tweet, state_centers):
         distance = geo_distance(state_positions,tweet_position)
         distance_dictionary[distance]  = inv_dictionary[state_positions]
 
-    return distance_dictionary[min[distance_dictionary]]
+    return distance_dictionary[min(distance_dictionary)]
 
 def group_tweets_by_state(tweets):
     """Return a dictionary that aggregates tweets by their nearest state center.
@@ -302,7 +301,10 @@ def group_tweets_by_state(tweets):
     tweets_by_state = {}
     us_centers = {n: find_state_center(s) for n, s in us_states.items()}
     for elem in tweets:
-        tweets_by_state[(find_closest_state(tweet), us_centers)] = [elem,]
+        if find_closest_state(elem, us_centers) not in tweets_by_state.keys():
+            tweets_by_state[find_closest_state(elem, us_centers)] = [elem]
+        else:
+            tweets_by_state[find_closest_state(elem, us_centers)] += [elem]
     return tweets_by_state
 
 def most_talkative_states(term):

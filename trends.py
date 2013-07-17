@@ -284,6 +284,11 @@ def find_closest_state(tweet, state_centers):
 
     return distance_dictionary[min(distance_dictionary)]
 
+
+
+def reverse_dictionary(dict):
+    return {values:keys for keys, values in dict.items()}
+
 def group_tweets_by_state(tweets):
     """Return a dictionary that aggregates tweets by their nearest state center.
 
@@ -320,6 +325,20 @@ def most_talkative_states(term):
     """
     tweets = load_tweets(make_tweet, term)  # A list of tweets containing term
     "*** YOUR CODE HERE ***"
+    tweets_by_state = group_tweets_by_state(tweets)
+
+    sorted_keys= sorted(group_tweets_by_state(tweets))
+    sorted_list = []
+    for key in sorted_keys:
+        sorted_list.append(len(tweets_by_state[key]))
+
+    top_five= []
+
+    for _ in range(5):
+        max_tweets_index = sorted_list.index(max(sorted_list))
+        max_tuple = (sorted_keys.pop(max_tweets_index),sorted_list.pop(max_tweets_index))
+        top_five.append(max_tuple)
+    return top_five
 
 
 
@@ -337,6 +356,21 @@ def average_sentiments(tweets_by_state):
     """
     averaged_state_sentiments = {}
     "*** YOUR CODE HERE ***"
+    total = 0
+    for keys in tweets_by_state.keys():
+        k = 0
+        for tweet in tweets_by_state[keys]:
+            if has_sentiment(analyze_tweet_sentiment(tweet)):
+                total += sentiment_value(analyze_tweet_sentiment(tweet))
+                k += 1
+
+        if k != 0:
+            average_sentiment_value = total/k
+            averaged_state_sentiments[keys] = average_sentiment_value
+
+
+
+
     return averaged_state_sentiments
 
 

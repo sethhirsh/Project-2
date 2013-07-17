@@ -356,9 +356,9 @@ def average_sentiments(tweets_by_state):
     """
     averaged_state_sentiments = {}
     "*** YOUR CODE HERE ***"
-    total = 0
     for keys in tweets_by_state.keys():
         k = 0
+        total = 0
         for tweet in tweets_by_state[keys]:
             if has_sentiment(analyze_tweet_sentiment(tweet)):
                 total += sentiment_value(analyze_tweet_sentiment(tweet))
@@ -367,7 +367,6 @@ def average_sentiments(tweets_by_state):
         if k != 0:
             average_sentiment_value = total/k
             averaged_state_sentiments[keys] = average_sentiment_value
-
 
 
 
@@ -431,7 +430,14 @@ def group_tweets_by_hour(tweets):
     """
     tweets_by_hour = {}
     "*** YOUR CODE HERE ***"
+    for tweet in tweets:
+        tweet_hour = tweet_time(tweet).hour
+        if tweet_hour not in tweets_by_hour.keys():
+            tweets_by_hour[tweet_time(tweet).hour] = [tweet]
+        else:
+            tweets_by_hour[tweet_time(tweet).hour] += [tweet]
     return tweets_by_hour
+
 
 
 # Interaction.  You don't need to read this section of the program.

@@ -34,22 +34,23 @@ def make_tweet(text, time, lat, lon):
 
 def tweet_words(tweet):
     """Return a list of the words in the text of a tweet."""
-    "*** YOUR CODE HERE ***"
+    
     return extract_words(tweet['text'])
 
 def tweet_time(tweet):
     """Return the datetime that represents when the tweet was posted."""
-    "*** YOUR CODE HERE ***"
+    
     return tweet['time']
 
 def tweet_location(tweet):
     """Return a position (see geo.py) that represents the tweet's location."""
-    "*** YOUR CODE HERE ***"
+    
     return make_position(tweet['latitude'], tweet['longitude'])
 
 def tweet_string(tweet):
     """Return a string representing the tweet."""
     location = tweet_location(tweet)
+    
     return '"{0}" @ {1}'.format(tweet['text'], (latitude(location), longitude(location)))
 
 def extract_words(text):
@@ -66,17 +67,22 @@ def extract_words(text):
     >>> extract_words('@(cat$.on^#$my&@keyboard***@#*')
     ['cat', 'on', 'my', 'keyboard']
     """
-    "*** YOUR CODE HERE ***"
     def helper(string,prev):
+        
         if len(string) == 0:
             return ''
+        
         elif string[-1] not in ascii_letters and prev not in ascii_letters:
             extra = ''
+        
         elif string[-1] not in ascii_letters and prev in ascii_letters:
             extra = ' '
-        elif string[-1] in ascii_letters:
+        
+        else:
             extra = string[-1]
-        return helper(string[:len(string)-1],string[-1]) + extra
+        
+        return helper(string[:len(string) - 1],string[-1]) + extra
+    
     return helper(text,'').split()
 
 
@@ -98,20 +104,23 @@ def make_sentiment(value):
     0
     """
     assert value is None or (value >= -1 and value <= 1), 'Illegal value'
-    "*** YOUR CODE HERE ***"
+    
     return (value, )
 
 def has_sentiment(s):
     """Return whether sentiment s has a value."""
     "*** YOUR CODE HERE ***"
+    
     if s[0] == None:
+       
        return False
+    
     return True
 
 def sentiment_value(s):
     """Return the value of a sentiment s."""
     assert has_sentiment(s), 'No sentiment value'
-    "*** YOUR CODE HERE ***"
+    
     return s[0]
 
 
@@ -129,6 +138,7 @@ def get_word_sentiment(word):
     False
     """
     # Learn more: http://docs.python.org/3/library/stdtypes.html#dict.get
+    
     return make_sentiment(word_sentiments.get(word))
 
 def analyze_tweet_sentiment(tweet):
@@ -151,14 +161,18 @@ def analyze_tweet_sentiment(tweet):
     """
     total = 0
     count = 0
-    "*** YOUR CODE HERE ***"
+
     for word in tweet_words(tweet):
+        
         if has_sentiment(get_word_sentiment(word)):
             total += sentiment_value(get_word_sentiment(word))
             count += 1
+
     if count == 0:
         return make_sentiment(None)
+
     average = total / count
+
     return make_sentiment(average)
 
 
@@ -188,17 +202,21 @@ def find_centroid(polygon):
     >>> tuple(map(float, find_centroid([p1, p2, p1])))  # A zero-area polygon
     (1.0, 2.0, 0.0)
     """
-    "*** YOUR CODE HERE ***"
-    polygon_area,c_x,c_y = 0,0,0
+    polygon_area = 0
+    c_x = 0
+    c_y = 0
+    
     length = len(polygon)
+    
     x = lambda i: latitude(polygon[i])
     y = lambda i: longitude(polygon[i])
+    
     for i in range(length-1):
         polygon_area += x(i) * y(i + 1) - x(i + 1) * y(i)
         c_x += (x(i) + x(i + 1)) * (x(i) * y(i + 1) - x(i + 1) * y(i))
         c_y += (y(i) + y(i + 1)) * (x(i) * y(i + 1) - x(i + 1) * y(i))
 
-    polygon_area = abs(polygon_area) / 2
+    polygon_area = polygon_area / 2
 
     if polygon_area == 0:
         return (x(0),y(0),polygon_area)
@@ -206,7 +224,7 @@ def find_centroid(polygon):
     c_x = c_x / (6 * polygon_area)
     c_y = c_y / (6 * polygon_area)
 
-    return (c_x, c_y, polygon_area)
+    return (c_x,c_y,abs(polygon_area))
 
 
 
@@ -231,7 +249,6 @@ def find_state_center(polygons):
     >>> round(longitude(hi), 5)
     -156.21763
     """
-    "*** YOUR CODE HERE ***"
     total_c_x = 0
     total_c_y = 0
     num_polygons = len(polygons)
@@ -273,8 +290,11 @@ def find_closest_state(tweet, state_centers):
     >>> find_closest_state(ny, us_centers)
     'NJ'
     """
-    "*** YOUR CODE HERE ***"
-    inv_dictionary = {v:k for k, v in state_centers.items()}
+    #Reverse the dictionary
+    inv_dictionary = {vals:keys for keys, vals in state_centers.items()}
+    
+    #Keys will be distances to nearest state.
+    #Values will be the corresponding state.
     distance_dictionary = {}
 
     for state_positions in inv_dictionary:
@@ -285,9 +305,6 @@ def find_closest_state(tweet, state_centers):
     return distance_dictionary[min(distance_dictionary)]
 
 
-
-def reverse_dictionary(dict):
-    return {values:keys for keys, values in dict.items()}
 
 def group_tweets_by_state(tweets):
     """Return a dictionary that aggregates tweets by their nearest state center.
@@ -305,11 +322,16 @@ def group_tweets_by_state(tweets):
     """
     tweets_by_state = {}
     us_centers = {n: find_state_center(s) for n, s in us_states.items()}
-    for elem in tweets:
-        if find_closest_state(elem, us_centers) not in tweets_by_state.keys():
-            tweets_by_state[find_closest_state(elem, us_centers)] = [elem]
+    
+    for single_tweet in tweets:
+        closest_state = find_closest_state(single_tweet, us_centers)
+        
+        if closest_state in tweets_by_state.keys():
+            tweets_by_state[closest_state] += [single_tweet]
+        
         else:
-            tweets_by_state[find_closest_state(elem, us_centers)] += [elem]
+            tweets_by_state[closest_state] = [single_tweet]
+    
     return tweets_by_state
 
 def most_talkative_states(term):
@@ -324,20 +346,21 @@ def most_talkative_states(term):
     [('CA', 57), ('NJ', 41), ('OH', 31), ('FL', 26), ('MA', 23)]
     """
     tweets = load_tweets(make_tweet, term)  # A list of tweets containing term
-    "*** YOUR CODE HERE ***"
     tweets_by_state = group_tweets_by_state(tweets)
-
+    
     sorted_keys= sorted(group_tweets_by_state(tweets))
     sorted_list = []
+    
+    top_five= []
+
     for key in sorted_keys:
         sorted_list.append(len(tweets_by_state[key]))
-
-    top_five= []
 
     for _ in range(5):
         max_tweets_index = sorted_list.index(max(sorted_list))
         max_tuple = (sorted_keys.pop(max_tweets_index),sorted_list.pop(max_tweets_index))
         top_five.append(max_tuple)
+    
     return top_five
 
 
@@ -355,20 +378,20 @@ def average_sentiments(tweets_by_state):
     tweets_by_state -- A dictionary from state names to lists of tweets
     """
     averaged_state_sentiments = {}
-    "*** YOUR CODE HERE ***"
+    
     for keys in tweets_by_state.keys():
         k = 0
         total = 0
+        
         for tweet in tweets_by_state[keys]:
+            
             if has_sentiment(analyze_tweet_sentiment(tweet)):
                 total += sentiment_value(analyze_tweet_sentiment(tweet))
                 k += 1
 
         if k != 0:
-            average_sentiment_value = total/k
+            average_sentiment_value = total / k
             averaged_state_sentiments[keys] = average_sentiment_value
-
-
 
     return averaged_state_sentiments
 
@@ -429,13 +452,16 @@ def group_tweets_by_hour(tweets):
     NY : 0.21875
     """
     tweets_by_hour = {}
-    "*** YOUR CODE HERE ***"
+    
     for tweet in tweets:
         tweet_hour = tweet_time(tweet).hour
+        
         if tweet_hour not in tweets_by_hour.keys():
             tweets_by_hour[tweet_time(tweet).hour] = [tweet]
+        
         else:
             tweets_by_hour[tweet_time(tweet).hour] += [tweet]
+    
     return tweets_by_hour
 
 
